@@ -89,7 +89,7 @@ class MechanismTokenizer:
 
         # Build vocabulary with the most frequent words
         sorted_words = sorted(qualified_words, key=lambda w: word_freq[w], reverse=True)
-        vocab_words = sorted_words[:vocab_size - len(self.vocab)]
+        vocab_words = sorted_words[:self.vocab_size - len(self.vocab)]
 
         # Add to vocabulary
         for i, word in enumerate(vocab_words):
