@@ -53,7 +53,7 @@ Both models offer:
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mechanism-flow-llm.git
+git clone https://github.com/Maximilian-Winter/mechanism-flow-llm.git
 cd mechanism-flow-llm
 pip install -r requirements.txt
 ```
