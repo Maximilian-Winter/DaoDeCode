@@ -1,3 +1,15 @@
+# 🐉 DaoDeCode 🐉
+"Act where the river bends; speak where the wind turns."
+
+A language model built not to conquer, but to flow.
+Discover the way of minimal intervention, maximal change.
+
+Mechanism Points. Transformation Patterns. Position-Timing Unity.
+
+— written at the foot of the Drachenfels, 2025.
+
+---
+
 # 📜 MechanismFlow & MechanismPoints LLMs
 
 Welcome to **MechanismFlow** and **MechanismPoints** —
