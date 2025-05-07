@@ -94,15 +94,6 @@ but to explore **how meaning arises from structure and change**.
 
 ---
 
-## 🛡️ License
-
-This project is licensed under the **Apache License 2.0**.
-(See below for full text.)
-
-You are free to:
-
-* Use this code commercially or non-commercially.
-* Modify and extend it.
 * Publish papers, models, or derivatives, with proper attribution.
 
 Please do **not** use it for unethical purposes, such as surveillance, misinformation, or harm to living beings.
