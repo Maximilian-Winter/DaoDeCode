@@ -139,7 +139,11 @@ class MechanismTokenizer:
         else:
             padded_ids = token_ids_list
             attention_masks = [[1] * len(ids) for ids in token_ids_list]
-        
+
+        if not padding and return_tensors is None and len(padded_ids) == 1:
+            padded_ids = padded_ids[0]
+            attention_masks = attention_masks[0]
+
         # Convert to tensors if requested
         if return_tensors == "pt":
             padded_ids = torch.tensor(padded_ids, dtype=torch.long)
@@ -342,8 +346,12 @@ class FiveElementsAttention(nn.Module):
         
         # Apply attention mask if provided
         if attention_mask is not None:
-            # Add the attention mask to the scores
-            attention_scores = attention_scores + attention_mask.unsqueeze(1).unsqueeze(2) * -10000.0
+            if attention_mask.dim() == 4:  # extended mask [b,1,1,seq_len]
+                attention_scores = attention_scores + attention_mask
+            else:  # basic 2-D mask [b,seq_len]
+                # turn 0→masked into -10 000 and broadcast to 4-D
+                extended = (1.0 - attention_mask.float()).unsqueeze(1).unsqueeze(2) * -10000.0
+                attention_scores = attention_scores + extended
         
         # Apply softmax for probability distribution
         attention_probs = F.softmax(attention_scores, dim=-1)
@@ -909,11 +917,18 @@ class TextDataset(Dataset):
     def _prepare_examples(self, texts):
         """Tokenize texts and split into chunks."""
         examples = []
-        
+
         for text in tqdm(texts, desc="Preparing examples"):
-            # Tokenize text
-            tokens = self.tokenizer(text, padding=False, truncation=False)
-            input_ids = tokens["input_ids"]
+            # Tokenize
+            tok_out = self.tokenizer(text, padding=False, truncation=False)
+            input_ids = tok_out["input_ids"]
+            if isinstance(input_ids[0], (list, tuple)):  # tokenizer returned [[...]]
+                input_ids = input_ids[0]
+
+            # Always keep a copy of the (possibly short) sequence
+            if len(input_ids) <= self.max_length:
+                examples.append({"input_ids": input_ids})
+                continue
             
             # Split into chunks
             if self.chunk_mode == "non-overlap":
@@ -1513,7 +1528,7 @@ def generate_text(model, tokenizer, prompt, **kwargs):
         # Analyze top mechanism points
         if mechanism_points:
             # Average mechanism strength across tokens
-            avg_mech_strength = torch.cat(mechanism_points).mean(0).cpu().numpy()
+            avg_mech_strength = torch.cat(mechanism_points).cpu().detach().numpy()
             
             # Get top mechanism indices
             top_indices = np.argsort(avg_mech_strength)[-5:][::-1]
@@ -1658,22 +1673,45 @@ def example_usage():
         "The I Ching describes 64 hexagrams representing different transformation patterns between states.",
         # Add more training texts here
     ]
-    
+    from datasets import load_dataset
+
+    # 1️⃣  Download + cache (only the first call hits the network)
+    tiny = load_dataset("karpathy/tiny_shakespeare", trust_remote_code=True)  # returns a DatasetDict
+
+    # 2️⃣  Peek at what you got
+    print(tiny)  # ⇢ DatasetDict({'train': Dataset(num_rows=1, columns=['text'])})
+    print(tiny["train"][0]["text"][:500])  # first 500 chars
+
+    # 3️⃣  Split the single long string into usable chunks
+    full_text = tiny["train"][0]["text"]  # one giant string (~1 MB)
+
+    # Example: break by newline for simple sentence-ish units
+    texts = [line.strip() for line in full_text.split("\n") if line.strip()]
+
+    # 4️⃣  Feed into your pipeline
+    model, tokenizer = train_model_from_scratch(
+        texts,
+        output_dir="model_tiny_shakespeare",
+        hidden_size=384,
+        num_hidden_layers=6,
+        num_attention_heads=6,
+        num_epochs=3,
+    )
     # Either train a new model or load an existing one
-    try:
-        model, tokenizer = load_trained_model("model")
-        logger.info("Loaded existing model")
-    except:
-        logger.info("No existing model found. Training new model.")
-        model, tokenizer = train_model_from_scratch(
-            sample_texts,
-            output_dir="model",
-            hidden_size=256,  # Small model for demonstration
-            num_hidden_layers=4,
-            num_attention_heads=4,
-            batch_size=2,
-            num_epochs=1,
-        )
+    #try:
+    #    model, tokenizer = load_trained_model("model")
+    #    logger.info("Loaded existing model")
+    #except:
+    #    logger.info("No existing model found. Training new model.")
+    #    model, tokenizer = train_model_from_scratch(
+    #        sample_texts,
+    #        output_dir="model",
+    #        hidden_size=256,  # Small model for demonstration
+    #        num_hidden_layers=4,
+    #        num_attention_heads=4,
+    #        batch_size=2,
+    #        num_epochs=1,
+    #    )
     
     # Generate text
     prompt = "The key insight about mechanism points is"

@@ -1,0 +1,9 @@
+{
+  "vocab_size": 133,
+  "model_type": "unigram",
+  "pad_token_id": 0,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "unk_token_id": 3,
+  "mechanism_token_id": 4
+}

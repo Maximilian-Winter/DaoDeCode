@@ -1,0 +1,5 @@
+The mechanism points concept focuses on identifying critical leverage points in complex systems.
+According to the Five Elements theory, wood represents expansion, fire represents transformation, earth represents stabilization, metal represents refinement, and water represents adaptation.
+In Conway's Game of Life, small changes to initial conditions can create dramatically different outcomes, demonstrating sensitivity to mechanism points.
+Position-timing unity suggests that 'where' and 'when' to intervene in a system are not separate considerations but aspects of a unified manifold.
+The I Ching describes 64 hexagrams representing different transformation patterns between states.
