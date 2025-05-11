@@ -13,6 +13,7 @@ from dataclasses import dataclass
 import random
 import json
 from tqdm import tqdm
+from transformers import AutoTokenizer
 
 
 # --------------------------
@@ -931,12 +932,8 @@ def main():
     num_epochs = 3
 
     # Create tokenizer
-    tokenizer = MechanismTokenizer(vocab_size=vocab_size)
+    tokenizer = AutoTokenizer.from_pretrained("gpt2")
 
-    # For this example, let's assume we've already trained the tokenizer
-    # In practice, you would call:
-    # tokenizer.train_from_texts(texts, min_freq=5, mechanism_threshold=0.01)
-    # tokenizer.save_vocabulary("vocab.json")
 
     # Create model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

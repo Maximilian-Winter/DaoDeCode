@@ -1,2 +1,6 @@
 /five_elements/model_tiny_shakespeare
 /basics/__pycache__
+/dao_transformer/outputs/checkpoint_epoch_3
+/dao_transformer/outputs/checkpoint_epoch_2
+/dao_transformer/outputs/checkpoint_epoch_1
+/dao_transformer/outputs/checkpoint_best
